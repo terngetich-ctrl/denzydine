@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify OTP - GCash</title>
+  <style>
+    :root {
+      --primary: #00b14f;
+      --primary-dark: #0d8d42;
+      --primary-soft: #dff9eb;
+      --ink: #1c1c1e;
+      --muted: #6b7280;
+      --line: #e8ebef;
+      --shadow: 0 22px 50px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(180deg, #edf7f2 0%, #f6f7fb 100%);
+      color: var(--ink);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .phone {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      min-height: 820px;
+      background: linear-gradient(180deg, #fbfcff 0%, #f6f9fd 100%);
+      border-radius: 34px;
+      border: 1px solid rgba(17, 24, 39, 0.05);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 26px 20px 120px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, #22c55e 100%);
+      position: relative;
+      box-shadow: 0 10px 18px rgba(0, 177, 79, 0.25);
+    }
+
+    .brand-mark::before {
+      content: "G";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .brand-text {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .chip {
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: var(--line);
+      border-radius: 999px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #22c55e);
+      transition: width 0.3s ease;
+    }
+
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: var(--primary-dark);
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .otp-title {
+      margin-top: 14px;
+      font-size: 38px;
+      line-height: 1.05;
+      letter-spacing: -0.065em;
+      font-weight: 900;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #4b5563;
+      font-weight: 800;
+    }
+
+    .input {
+      width: 100%;
+      height: 54px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.9);
+      padding: 0 16px;
+      font-size: 15px;
+      color: var(--ink);
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .input:focus {
+      border-color: rgba(0, 177, 79, 0.7);
+      box-shadow: 0 0 0 4px rgba(0, 177, 79, 0.12);
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 26px;
+    }
+
+    .timer {
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+
+    .link {
+      color: var(--primary-dark);
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button.primary {
+      width: 100%;
+      border: none;
+      background: linear-gradient(135deg, var(--primary) 0%, #13a95b 100%);
+      color: #fff;
+      height: 58px;
+      border-radius: 18px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 16px 28px rgba(0, 177, 79, 0.24);
+      transition: 0.2s ease;
+      margin-bottom: 12px;
+    }
+
+    button.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 36px rgba(0, 177, 79, 0.3);
+    }
+
+    .footer {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 12px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-text">GCash</div>
+      </div>
+      <span class="chip">Secure</span>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 90%;"></div>
+    </div>
+
+    <button class="back-btn" onclick="goBack()">← Back</button>
+
+    <h2 class="otp-title">Verify OTP</h2>
+    <div class="sub">Enter the 6-digit code we sent to your mobile number.</div>
+
+    <div class="field">
+      <label class="label" for="otpcode">OTP Code</label>
+      <input id="otpcode" class="input" type="text" placeholder="Enter 6-digit code" maxlength="6" />
+    </div>
+
+    <div class="meta">
+      <span>Didn't receive it?</span>
+      <span class="timer">00:39</span>
+    </div>
+
+    <button class="primary" onclick="proceedToSuccess()">Verify</button>
+
+    <div style="text-align: center; margin-top: 10px;">
+      <a href="#" class="link">Resend OTP</a>
+    </div>
+
+    <div class="footer">© 2026 GCash. All rights reserved.</div>
+  </div>
+
+  <script>
+    function goBack() {
+      window.location.href = 'login.html';
+    }
+
+    function proceedToSuccess() {
+      const otpcode = document.getElementById('otpcode').value;
+
+      if (!otpcode || otpcode.length !== 6) {
+        alert('Please enter a valid 6-digit OTP code');
+        return;
+      }
+
+      window.location.href = 'success.html';
+    }
+  </script>
+</body>
+</html>

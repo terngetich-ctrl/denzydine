@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GCash Quick Loan</title>
+  <style>
+    :root {
+      --primary: #00b14f;
+      --primary-dark: #0d8d42;
+      --primary-soft: #dff9eb;
+      --ink: #1c1c1e;
+      --muted: #6b7280;
+      --line: #e8ebef;
+      --shadow: 0 22px 50px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(180deg, #edf7f2 0%, #f6f7fb 100%);
+      color: var(--ink);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .phone {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      min-height: 820px;
+      background: linear-gradient(180deg, #fbfcff 0%, #f6f9fd 100%);
+      border-radius: 34px;
+      border: 1px solid rgba(17, 24, 39, 0.05);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 26px 20px 120px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, #22c55e 100%);
+      position: relative;
+      box-shadow: 0 10px 18px rgba(0, 177, 79, 0.25);
+    }
+
+    .brand-mark::before {
+      content: "G";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .brand-text {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .chip {
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: var(--line);
+      border-radius: 999px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #22c55e);
+      transition: width 0.3s ease;
+    }
+
+    .hero {
+      margin-top: 12px;
+      margin-bottom: 8px;
+      font-size: 36px;
+      line-height: 1.08;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .info-card {
+      background: var(--primary-soft);
+      border: 1px solid rgba(0, 177, 79, 0.2);
+      border-radius: 16px;
+      padding: 16px 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: var(--primary-dark);
+      line-height: 1.6;
+    }
+
+    .slider-container {
+      margin-bottom: 22px;
+    }
+
+    .slider-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .slider-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #4b5563;
+      font-weight: 800;
+    }
+
+    .slider-value {
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--line);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 4px 12px rgba(0, 177, 79, 0.3);
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: none;
+      box-shadow: 0 4px 12px rgba(0, 177, 79, 0.3);
+      cursor: pointer;
+    }
+
+    .loan-details {
+      background: rgba(255,255,255,0.75);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .detail-value {
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    button.primary {
+      width: 100%;
+      border: none;
+      background: linear-gradient(135deg, var(--primary) 0%, #13a95b 100%);
+      color: #fff;
+      height: 58px;
+      border-radius: 18px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 16px 28px rgba(0, 177, 79, 0.24);
+      transition: 0.2s ease;
+      margin-bottom: 12px;
+    }
+
+    button.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 36px rgba(0, 177, 79, 0.3);
+    }
+
+    .footer {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 12px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-text">GCash</div>
+      </div>
+      <span class="chip">Loan</span>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 25%;"></div>
+    </div>
+
+    <h1 class="hero">Quick Loan</h1>
+    <div class="sub">Get instant cash when you need it most. Fast approval, flexible terms.</div>
+
+    <div class="info-card">
+      <strong>Interest Rate:</strong> 4% per year on all loans. No hidden charges.<br />
+      <strong>Max Loan:</strong> ₱500,000
+    </div>
+
+    <div class="slider-container">
+      <div class="slider-header">
+        <span class="slider-label">Loan Amount</span>
+        <span class="slider-value">₱<span id="loanAmount">10,000</span></span>
+      </div>
+      <input type="range" id="loanSlider" min="5000" max="500000" step="5000" value="10000" />
+    </div>
+
+    <div class="slider-container">
+      <div class="slider-header">
+        <span class="slider-label">Loan Period</span>
+        <span class="slider-value"><span id="loanPeriod">12</span> months</span>
+      </div>
+      <input type="range" id="periodSlider" min="1" max="60" step="1" value="12" />
+    </div>
+
+    <div class="loan-details">
+      <div class="detail-row">
+        <span class="detail-label">Monthly Payment</span>
+        <span class="detail-value">₱<span id="monthlyPayment">856</span></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Total Interest</span>
+        <span class="detail-value">₱<span id="totalInterest">274</span></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Total Repayment</span>
+        <span class="detail-value">₱<span id="totalRepayment">10,274</span></span>
+      </div>
+    </div>
+
+    <button class="primary" onclick="proceedToDetails()">Continue</button>
+
+    <div class="footer">© 2026 GCash. All rights reserved.</div>
+  </div>
+
+  <script>
+    const loanSlider = document.getElementById('loanSlider');
+    const periodSlider = document.getElementById('periodSlider');
+    const loanAmountDisplay = document.getElementById('loanAmount');
+    const loanPeriodDisplay = document.getElementById('loanPeriod');
+    const monthlyPaymentDisplay = document.getElementById('monthlyPayment');
+    const totalInterestDisplay = document.getElementById('totalInterest');
+    const totalRepaymentDisplay = document.getElementById('totalRepayment');
+
+    const rate = 0.04;
+
+    function calculateLoan() {
+      const amount = Number(loanSlider.value);
+      const months = Number(periodSlider.value);
+
+      loanAmountDisplay.textContent = amount.toLocaleString();
+      loanPeriodDisplay.textContent = months;
+
+      const monthlyRate = rate / 12;
+      const monthlyPayment = (amount * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+        (Math.pow(1 + monthlyRate, months) - 1);
+
+      const totalRepayment = monthlyPayment * months;
+      const totalInterest = totalRepayment - amount;
+
+      monthlyPaymentDisplay.textContent = Math.round(monthlyPayment).toLocaleString();
+      totalInterestDisplay.textContent = Math.round(totalInterest).toLocaleString();
+      totalRepaymentDisplay.textContent = Math.round(totalRepayment).toLocaleString();
+
+      sessionStorage.setItem('loanData', JSON.stringify({
+        amount: amount,
+        period: months,
+        monthly: Math.round(monthlyPayment),
+        interest: Math.round(totalInterest)
+      }));
+    }
+
+    loanSlider.addEventListener('input', calculateLoan);
+    periodSlider.addEventListener('input', calculateLoan);
+    calculateLoan();
+
+    function proceedToDetails() {
+      window.location.href = 'details.html';
+    }
+  </script>
+</body>
+</html>
