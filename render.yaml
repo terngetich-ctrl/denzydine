@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: denzydine
-    env: static
-    staticPublishPath: .
-    buildCommand: ""
